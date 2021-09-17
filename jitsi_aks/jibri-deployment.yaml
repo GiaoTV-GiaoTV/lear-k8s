@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: jibri
+  name: jibri
+  namespace: jitsi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jibri
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: jibri
+    spec:
+      containers:
+        - image: jitsi/jibri:stable-5870
+          name: jibri
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+          env:
+          - name: DISPLAY
+            value: ":0"
+          envFrom:
+          - configMapRef:
+              name: jitsi-config
+          ports:
+            - containerPort: 2222
+            - containerPort: 3333
+      restartPolicy: Always

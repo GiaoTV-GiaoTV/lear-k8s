@@ -1,0 +1,49 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web
+  namespace: jitsi
+  annotations:
+    kubernetes.io/ingress.class: addon-http-application-routing
+    nginx.ingress.kubernetes.io/cors-allow-headers: Accept, Accept-Version, Access-Control-Allow-Headers,
+      Access-Token, AccessToken, Authorization, Cache-Control, Content-Length, Content-MD5,
+      Content-Type, DNT, Date, If-Modified-Since, Keep-Alive, User-Agent, X-Access-Token,
+      X-Auth-Token, X-CustomHeader, X-Requested-With, accessToken, accesstoken, content-type
+    nginx.ingress.kubernetes.io/cors-allow-methods: GET, PUT, POST, DELETE, PATCH,
+      OPTIONS
+    nginx.ingress.kubernetes.io/cors-allow-origin: '*'
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 300m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/fastcgi_send_timeout: "1800"
+    nginx.ingress.kubernetes.io/fastcgi_read_timeout: "1800"
+    nginx.ingress.kubernetes.io/fastcgi_connect_timeout: "180"
+    nginx.ingress.kubernetes.io/server-snippets: |
+        location / {
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_http_version 1.1;
+            proxy_set_header X-Forwarded-Host $http_host;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-For $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header Connection "upgrade";
+            proxy_cache_bypass $http_upgrade;
+        }
+spec:
+  tls:
+    - hosts:
+      - jitsi1.giaotv.online
+      secretName: jitsi-tls-secret
+  rules:
+  - host : jitsi1.giaotv.online
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web
+            port:
+              number: 80

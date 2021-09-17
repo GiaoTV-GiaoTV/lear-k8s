@@ -1,0 +1,38 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: mongodump
+  namespace: rocketchat
+spec:
+  schedule: '10 19 * * *'
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 0
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: mongodb
+              image: mongo:4.2
+              command : ["/bin/sh", "-c","/tmp/backup.sh"]
+              env:
+              - name: MONGO_URL
+                valueFrom:
+                  secretKeyRef:
+                    name: rocketchatsecret
+                    key: MONGO_URL
+              volumeMounts:
+              - mountPath: "/usr/share/mongodump/"
+                name: rocketchatdb-dump
+              - name: backup-script
+                mountPath: /tmp/backup.sh
+                subPath: backup.sh
+          volumes:
+          - name: rocketchatdb-dump
+            persistentVolumeClaim:
+              claimName: rocketchatdb-dump
+          - name: backup-script
+            configMap:
+              name: mongo-dump-script
+              defaultMode: 0777

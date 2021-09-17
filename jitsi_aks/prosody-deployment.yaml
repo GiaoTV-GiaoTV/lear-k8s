@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: prosody
+  name: prosody
+  namespace: jitsi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prosody
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: prosody
+    spec:
+      containers:
+        - image: jitsi/prosody:stable-5870
+          name: prosody
+          envFrom:
+            - configMapRef:
+                name: jitsi-config
+          ports:
+            # Activated service 'c2s' on 5222
+            - containerPort: 5222
+            # Activated service 's2s' on 5269
+            - containerPort: 5269
+            # Activated service 'http' on 5280
+            - containerPort: 5280
+            # Activated service 'component' on 5347
+            - containerPort: 5347
+      restartPolicy: Always

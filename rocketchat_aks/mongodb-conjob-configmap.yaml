@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  backup.sh: |
+    echo $MONGO_URL
+    mongodump --uri $MONGO_URL --gzip --out /usr/share/mongodump/rocketchatdb-$(date +%d%m%Y)
+kind: ConfigMap
+metadata:
+  name: mongo-dump-script
+  namespace: rocketchat

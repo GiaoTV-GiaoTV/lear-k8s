@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jicofo
+  namespace: jitsi
+spec:
+  selector:
+    app: jicofo
+  ports:
+    - port: 8888
+      targetPort: 8888
+      name: "port-8888"
+  type: ClusterIP

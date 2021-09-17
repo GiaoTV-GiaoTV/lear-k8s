@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: web
+  name: web
+  namespace: jitsi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - image: jitsi/web:stable-5870
+          name: web
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+          envFrom:
+          - configMapRef:
+              name: jitsi-config
+      restartPolicy: Always

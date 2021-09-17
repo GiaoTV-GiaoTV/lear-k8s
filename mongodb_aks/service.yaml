@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  namespace: mongodb-dev
+spec:
+  type: LoadBalancer
+  selector:
+    app: mongo
+  ports:
+    - port: 27017
+      #nodePort: 30654  
+      targetPort: 27017
